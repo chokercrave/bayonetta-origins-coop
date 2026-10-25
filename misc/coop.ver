@@ -1,0 +1,2 @@
+/* Export nothing: rtld must never bind the dynamic-FPS module (or any other exlaunch module) to our symbols, nor ours to theirs. */
+{ local: *; };

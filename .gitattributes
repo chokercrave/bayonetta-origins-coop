@@ -1,0 +1,2 @@
+# The build runs in the Linux devkitA64 container: shell scripts, make files and specs must keep LF line endings.
+* text=auto eol=lf

@@ -1,0 +1,9 @@
+build/
+deploy/
+dist/
+cmake-build*/
+*.elf
+*.nso
+*.npdm
+*.map
+*.lst

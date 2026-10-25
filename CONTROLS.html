@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Origins Co-op Controls</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;1,500&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a storybook field guide. One centered reading column; the two players' controller cards sit side by side
+   on wide screens and stack on phones. Plum = Cereza (P1), moss teal = Cheshire (P2), on a cool forest-paper ground. */
+:root {
+  --paper: #f3f5f1;
+  --sheet: #ffffff;
+  --ink: #1f2a26;
+  --muted: #5b6a63;
+  --rule: #d5ddd7;
+  --cereza: #8b3a86;
+  --cereza-soft: #f3e3f1;
+  --cheshire: #1d7a6c;
+  --cheshire-soft: #dcf0eb;
+  --off: #c3ccc7;
+  --warn: #9a5b00;
+  --warn-soft: #fbefd9;
+  --font-display: "Alegreya", "Iowan Old Style", Georgia, serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121a17; --sheet: #19231f; --ink: #e4ebe7; --muted: #9db0a7; --rule: #2c3a34;
+    --cereza: #d98ad3; --cereza-soft: #3a2338; --cheshire: #5fc7b5; --cheshire-soft: #173a34;
+    --off: #3d4b45; --warn: #e8b05a; --warn-soft: #3a2c14; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121a17; --sheet: #19231f; --ink: #e4ebe7; --muted: #9db0a7; --rule: #2c3a34;
+  --cereza: #d98ad3; --cereza-soft: #3a2338; --cheshire: #5fc7b5; --cheshire-soft: #173a34;
+  --off: #3d4b45; --warn: #e8b05a; --warn-soft: #3a2c14; color-scheme: dark;
+}
+
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); font-weight: 700; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; }
+.prose { max-width: 66ch; display: grid; gap: 12px; }
+.eyebrow { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+a { color: var(--cheshire); }
+:focus-visible { outline: 2px solid var(--cheshire); outline-offset: 2px; }
+
+header { display: grid; gap: 14px; margin-bottom: 40px; }
+.lede { font-size: 1.12rem; max-width: 62ch; }
+.who { display: flex; flex-wrap: wrap; gap: 10px; }
+.tag { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.92rem; }
+.tag i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.tag.p1 { background: var(--cereza-soft); color: var(--cereza); } .tag.p1 i { background: var(--cereza); }
+.tag.p2 { background: var(--cheshire-soft); color: var(--cheshire); } .tag.p2 i { background: var(--cheshire); }
+.status { font-size: 0.9rem; color: var(--muted); }
+
+section { display: grid; gap: 18px; margin-top: 52px; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 28px; align-items: center; }
+@media (max-width: 760px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+svg { display: block; width: 100%; height: auto; max-width: 100%; }
+.pad-body { fill: var(--sheet); stroke: var(--rule); stroke-width: 2; }
+.btn { stroke-width: 1.6; }
+.btn.off { fill: var(--paper); stroke: var(--off); }
+.p1 .btn.on { fill: var(--cereza); stroke: var(--cereza); }
+.p1 .btn.fold { fill: var(--cereza-soft); stroke: var(--cereza); stroke-dasharray: 4 3; }
+.p2 .btn.on { fill: var(--cheshire); stroke: var(--cheshire); }
+.p2 .btn.fold { fill: var(--cheshire-soft); stroke: var(--cheshire); stroke-dasharray: 4 3; }
+.half-l { fill: var(--cereza-soft); }
+.half-r { fill: var(--cheshire-soft); }
+.lbl { font-family: var(--font-body); font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+.btn.on + .lbl { fill: var(--sheet); }
+.btn.fold + .lbl, .btn.off + .lbl { fill: var(--muted); }
+.half-cap { font-family: var(--font-display); font-size: 17px; font-weight: 700; text-anchor: middle; }
+.half-cap.l { fill: var(--cereza); } .half-cap.r { fill: var(--cheshire); }
+.x { stroke: var(--off); stroke-width: 2; }
+
+.players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+@media (max-width: 860px) { .players { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--sheet); border-radius: 14px; padding: 22px; display: grid; gap: 16px; align-content: start; border-top: 6px solid; }
+.card.p1 { border-color: var(--cereza); } .card.p2 { border-color: var(--cheshire); }
+.card header { margin: 0; gap: 4px; }
+.card.p1 h3 { color: var(--cereza); } .card.p2 h3 { color: var(--cheshire); }
+.key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.84rem; color: var(--muted); }
+.key span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 4px; border: 1.6px solid; display: inline-block; }
+.p1 .sw.on { background: var(--cereza); border-color: var(--cereza); }
+.p1 .sw.fold { background: var(--cereza-soft); border-color: var(--cereza); border-style: dashed; }
+.p2 .sw.on { background: var(--cheshire); border-color: var(--cheshire); }
+.p2 .sw.fold { background: var(--cheshire-soft); border-color: var(--cheshire); border-style: dashed; }
+.sw.off { background: var(--paper); border-color: var(--off); }
+
+.legend { display: grid; gap: 0; margin: 0; }
+.legend div { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); gap: 12px; padding: 9px 0; border-top: 1px solid var(--rule); }
+.legend dt { font-weight: 700; display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; }
+.legend dd { margin: 0; min-width: 0; }
+.chip { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; padding: 1px 7px; border-radius: 6px; border: 1.5px solid var(--rule); white-space: nowrap; }
+.p1 .chip { border-color: var(--cereza); color: var(--cereza); }
+.p2 .chip { border-color: var(--cheshire); color: var(--cheshire); }
+.note { color: var(--muted); font-size: 0.88rem; }
+
+.table-scroll { overflow-x: auto; background: var(--sheet); border-radius: 14px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.95rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td.c1 { color: var(--cereza); font-weight: 700; } td.c2 { color: var(--cheshire); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+
+.scenes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 760px) { .scenes { grid-template-columns: minmax(0, 1fr); } }
+.scene { display: grid; gap: 10px; align-content: start; padding-top: 14px; border-top: 2px solid var(--ink); }
+.scene ol, .scene ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+
+.modes { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 14px; align-items: stretch; }
+@media (max-width: 640px) { .modes { grid-template-columns: minmax(0, 1fr); } .arrow { transform: rotate(90deg); justify-self: center; } }
+.mode { background: var(--sheet); border-radius: 14px; padding: 18px; display: grid; gap: 8px; align-content: start; }
+.mode h3 { font-size: 1.1rem; }
+.arrow { align-self: center; text-align: center; font-weight: 700; color: var(--muted); font-size: 0.85rem; }
+.arrow b { display: block; font-size: 1.6rem; line-height: 1; color: var(--ink); }
+
+.verify { background: var(--warn-soft); border-radius: 14px; padding: 20px 22px; display: grid; gap: 10px; }
+.verify h2 { color: var(--warn); font-size: 1.3rem; }
+.verify ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.86rem; display: grid; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Bayonetta Origins · co-op mod v0.8.0</span>
+    <h1>Origins Co-op Controls</h1>
+    <p class="lede">Two players, one controller each. Player 1 is Cereza, Player 2 is Cheshire. Each player's whole controller drives their own character, so it doesn't matter which hand you hold things in.</p>
+    <div class="who"><span class="tag p1"><i></i>Player 1 · Cereza</span><span class="tag p2"><i></i>Player 2 · Cheshire</span></div>
+    <p class="status">Beta. Tested on the Eden emulator only; real hardware is untested and not supported yet.</p>
+  </header>
+
+  <section aria-labelledby="idea">
+    <div class="split">
+      <div class="prose">
+        <span class="eyebrow">The idea</span>
+        <h2 id="idea">The game already splits one controller in half</h2>
+        <p>In the normal game you play both characters at once: the left half of the controller is Cereza, the right half is Cheshire. The mod builds that same controller from two. Player 1's controller fills in the left half, Player 2's fills in the right half.</p>
+        <p>Each player also gets the half of their controller that would otherwise belong to the other character, folded onto their own buttons. Player 1 can move Cereza with either stick, and Player 2 can attack with either trigger.</p>
+      </div>
+      <svg viewBox="0 0 400 250" role="img" aria-label="A controller split down the middle: the left half (left stick, L, ZL, D-pad, minus) is Cereza, the right half (right stick, R, ZR, A B X Y, plus) is Cheshire.">
+        <defs><clipPath id="padclip"><path d="M120 62 H280 C330 62 362 80 372 120 L392 206 C398 232 376 246 354 236 C332 226 318 200 296 186 H104 C82 200 68 226 46 236 C24 246 2 232 8 206 L28 120 C38 80 70 62 120 62 Z"/></clipPath></defs>
+        <g clip-path="url(#padclip)"><rect class="half-l" x="0" y="0" width="200" height="250"/><rect class="half-r" x="200" y="0" width="200" height="250"/></g>
+        <path d="M120 62 H280 C330 62 362 80 372 120 L392 206 C398 232 376 246 354 236 C332 226 318 200 296 186 H104 C82 200 68 226 46 236 C24 246 2 232 8 206 L28 120 C38 80 70 62 120 62 Z" fill="none" stroke="var(--rule)" stroke-width="2"/>
+        <line x1="200" y1="56" x2="200" y2="196" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text class="half-cap l" x="100" y="22">Cereza</text>
+        <text class="half-cap r" x="300" y="22">Cheshire</text>
+        <g class="p1">
+          <rect class="btn on" x="66" y="34" width="84" height="18" rx="9"/><text class="lbl" x="108" y="43">L · ZL</text>
+          <circle class="btn on" cx="110" cy="115" r="22"/><text class="lbl" x="110" y="115">stick</text>
+          <path class="btn on" d="M143 146 h14 v14 h14 v14 h-14 v14 h-14 v-14 h-14 v-14 h14 z"/>
+          <circle class="btn on" cx="168" cy="98" r="8"/><text class="lbl" x="168" y="98">−</text>
+        </g>
+        <g class="p2">
+          <rect class="btn on" x="250" y="34" width="84" height="18" rx="9"/><text class="lbl" x="292" y="43">R · ZR</text>
+          <circle class="btn on" cx="266" cy="115" r="11"/><text class="lbl" x="266" y="115">Y</text>
+          <circle class="btn on" cx="290" cy="91" r="11"/><text class="lbl" x="290" y="91">X</text>
+          <circle class="btn on" cx="314" cy="115" r="11"/><text class="lbl" x="314" y="115">A</text>
+          <circle class="btn on" cx="290" cy="139" r="11"/><text class="lbl" x="290" y="139">B</text>
+          <circle class="btn on" cx="250" cy="167" r="22"/><text class="lbl" x="250" y="167">stick</text>
+          <circle class="btn on" cx="232" cy="98" r="8"/><text class="lbl" x="232" y="98">+</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section aria-labelledby="pads">
+    <div class="prose">
+      <span class="eyebrow">Your controller</span>
+      <h2 id="pads">What each button does</h2>
+      <p>Filled buttons are your character's own controls. Dashed buttons are the other half of your controller, folded onto the same actions. Grey buttons do nothing.</p>
+    </div>
+
+    <div class="players">
+      <article class="card p1" aria-labelledby="p1h">
+        <header><span class="eyebrow">Player 1 · emulator slot "Player 1" or handheld</span><h3 id="p1h">Cereza</h3></header>
+        <svg viewBox="0 0 400 240" role="img" aria-label="Player 1's controller: every button is live for Cereza; the right half mirrors the left half.">
+          <g class="p1">
+            <path class="pad-body" d="M120 52 H280 C330 52 362 70 372 110 L392 196 C398 222 376 236 354 226 C332 216 318 190 296 176 H104 C82 190 68 216 46 226 C24 236 2 222 8 196 L28 110 C38 70 70 52 120 52 Z"/>
+            <rect class="btn on" x="66" y="6" width="84" height="16" rx="8"/><text class="lbl" x="108" y="14">ZL</text>
+            <rect class="btn on" x="60" y="28" width="96" height="16" rx="8"/><text class="lbl" x="108" y="36">L</text>
+            <rect class="btn fold" x="250" y="6" width="84" height="16" rx="8"/><text class="lbl" x="292" y="14">ZR → ZL</text>
+            <rect class="btn fold" x="244" y="28" width="96" height="16" rx="8"/><text class="lbl" x="292" y="36">R → L</text>
+            <circle class="btn on" cx="110" cy="105" r="22"/><text class="lbl" x="110" y="105">move</text>
+            <path class="btn on" d="M143 136 h14 v14 h14 v14 h-14 v14 h-14 v-14 h-14 v-14 h14 z"/>
+            <circle class="btn off" cx="266" cy="105" r="11"/><text class="lbl" x="266" y="105">Y</text>
+            <circle class="btn off" cx="290" cy="81" r="11"/><text class="lbl" x="290" y="81">X</text>
+            <circle class="btn off" cx="314" cy="105" r="11"/><text class="lbl" x="314" y="105">A</text>
+            <circle class="btn off" cx="290" cy="129" r="11"/><text class="lbl" x="290" y="129">B</text>
+            <circle class="btn fold" cx="250" cy="157" r="22"/><text class="lbl" x="250" y="157">move</text>
+            <circle class="btn on" cx="168" cy="88" r="8"/><text class="lbl" x="168" y="88">−</text>
+            <circle class="btn on" cx="232" cy="88" r="8"/><text class="lbl" x="232" y="88">+</text>
+          </g>
+        </svg>
+        <div class="key"><span><i class="sw on"></i>Cereza's own</span><span><i class="sw fold"></i>folded onto Cereza</span><span><i class="sw off"></i>menus and text only</span></div>
+        <dl class="legend">
+          <div><dt><span class="chip">either stick</span></dt><dd>Move Cereza. Whichever stick is pushed further wins.</dd></div>
+          <div><dt><span class="chip">L</span><span class="chip">R</span></dt><dd>Jump, interact, and pick Cheshire up into Hug Mode. Context decides which.</dd></div>
+          <div><dt><span class="chip">ZL</span><span class="chip">ZR</span></dt><dd>Umbran Arts and Witch Pulse.</dd></div>
+          <div><dt><span class="chip">D-pad</span></dt><dd>Cereza's D-pad.</dd></div>
+          <div><dt><span class="chip">Y X A B</span></dt><dd>Nothing during play (they belong to Cheshire). When text is on screen, A advances or closes it. In menus and pop-up windows they work as normal: A confirms, B goes back.</dd></div>
+          <div><dt><span class="chip">+</span><span class="chip">−</span></dt><dd>Pause and map. Only Player 1 can open them (see <a href="#menus">Menus</a>).</dd></div>
+        </dl>
+      </article>
+
+      <article class="card p2" aria-labelledby="p2h">
+        <header><span class="eyebrow">Player 2 · emulator slot "Player 2"</span><h3 id="p2h">Cheshire</h3></header>
+        <svg viewBox="0 0 400 240" role="img" aria-label="Player 2's controller: every button except plus and minus is live for Cheshire; the left half mirrors the right half.">
+          <g class="p2">
+            <path class="pad-body" d="M120 52 H280 C330 52 362 70 372 110 L392 196 C398 222 376 236 354 226 C332 216 318 190 296 176 H104 C82 190 68 216 46 226 C24 236 2 222 8 196 L28 110 C38 70 70 52 120 52 Z"/>
+            <rect class="btn fold" x="66" y="6" width="84" height="16" rx="8"/><text class="lbl" x="108" y="14">ZL → ZR</text>
+            <rect class="btn on" x="60" y="28" width="96" height="16" rx="8"/><text class="lbl" x="108" y="36">L · Hug</text>
+            <rect class="btn on" x="250" y="6" width="84" height="16" rx="8"/><text class="lbl" x="292" y="14">ZR</text>
+            <rect class="btn on" x="244" y="28" width="96" height="16" rx="8"/><text class="lbl" x="292" y="36">R</text>
+            <circle class="btn fold" cx="110" cy="105" r="22"/><text class="lbl" x="110" y="105">move</text>
+            <g><path class="btn fold" d="M143 136 h14 v14 h14 v14 h-14 v14 h-14 v-14 h-14 v-14 h14 z"/></g>
+            <circle class="btn on" cx="266" cy="105" r="11"/><text class="lbl" x="266" y="105">Y</text>
+            <circle class="btn on" cx="290" cy="81" r="11"/><text class="lbl" x="290" y="81">X</text>
+            <circle class="btn on" cx="314" cy="105" r="11"/><text class="lbl" x="314" y="105">A</text>
+            <circle class="btn on" cx="290" cy="129" r="11"/><text class="lbl" x="290" y="129">B</text>
+            <circle class="btn on" cx="250" cy="157" r="22"/><text class="lbl" x="250" y="157">move</text>
+            <circle class="btn off" cx="168" cy="88" r="8"/><line class="x" x1="162" y1="82" x2="174" y2="94"/>
+            <circle class="btn off" cx="232" cy="88" r="8"/><line class="x" x1="226" y1="82" x2="238" y2="94"/>
+          </g>
+        </svg>
+        <div class="key"><span><i class="sw on"></i>Cheshire's own</span><span><i class="sw fold"></i>folded onto Cheshire</span><span><i class="sw off"></i>disabled</span></div>
+        <dl class="legend">
+          <div><dt><span class="chip">either stick</span></dt><dd>Move Cheshire. In Hug Mode it aims his stretch instead.</dd></div>
+          <div><dt><span class="chip">ZR</span><span class="chip">ZL</span></dt><dd>Attack.</dd></div>
+          <div><dt><span class="chip">R</span></dt><dd>Send Cheshire out of Hug Mode, or stretch him out while hugged.</dd></div>
+          <div><dt><span class="chip">L</span></dt><dd>Put Cheshire into Hug Mode. It's the same button as Cereza's L, so it can also make her jump or interact.</dd></div>
+          <div><dt><span class="chip">Y X A B</span><span class="chip">D-pad</span></dt><dd>Elemental forms: Wood, Water, Fire, Stone, each on its own button once unlocked. Press the same one again to return to normal. D-pad arrows work by position: left Y, up X, right A, down B.</dd></div>
+          <div><dt><span class="chip">+</span><span class="chip">−</span></dt><dd>Disabled. Player 1 owns pause and menus.</dd></div>
+        </dl>
+      </article>
+    </div>
+    <p class="note">The game doesn't say which face button holds which element. Check the prompt that appears when each core is unlocked. Stick clicks are mirrored the same way: either click counts as the character's own stick click.</p>
+  </section>
+
+  <section aria-labelledby="sheet">
+    <div class="prose"><span class="eyebrow">Quick reference</span><h2 id="sheet">Who does what</h2></div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Action</th><th>Player</th><th>Buttons</th></tr></thead>
+        <tbody>
+          <tr><td>Walk Cereza</td><td class="c1">P1</td><td>either stick</td></tr>
+          <tr><td>Jump, interact</td><td class="c1">P1</td><td>L or R</td></tr>
+          <tr><td>Umbran Arts, Witch Pulse</td><td class="c1">P1</td><td>ZL or ZR</td></tr>
+          <tr><td>Move Cheshire</td><td class="c2">P2</td><td>either stick</td></tr>
+          <tr><td>Attack</td><td class="c2">P2</td><td>ZR or ZL</td></tr>
+          <tr><td>Change element</td><td class="c2">P2</td><td>Y X A B, or the D-pad</td></tr>
+          <tr><td>Hug Mode: pick Cheshire up</td><td>either</td><td>P1: L or R · P2: L</td></tr>
+          <tr><td>Hug Mode: send Cheshire out</td><td class="c2">P2</td><td>R</td></tr>
+          <tr><td>Pause, map</td><td class="c1">P1</td><td>+ or −</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="scenes">
+    <div class="prose"><span class="eyebrow">In play</span><h2 id="scenes">Situations</h2></div>
+    <div class="scenes">
+      <div class="scene">
+        <h3>Before you start</h3>
+        <ol>
+          <li>In the emulator's controller settings, set Player 1 to your first controller (or play handheld) and connect Player 2.</li>
+          <li>Keep the <em>Origins Coop</em> mod enabled in the game's add-ons. Other code mods, such as a dynamic-FPS mod, can stay on as long as they use a different slot than <span class="mono">subsdk8</span>.</li>
+          <li>If Player 2 isn't connected, the game plays exactly as normal, with P1 controlling both characters.</li>
+        </ol>
+      </div>
+      <div class="scene">
+        <h3>Title screen</h3>
+        <p>On the title screen and the main menu, Player 1 has a normal controller: A confirms, B goes back, ZL + ZR starts, the shoulders switch tabs. Player 2 is ignored until the game starts.</p>
+      </div>
+      <div class="scene">
+        <h3>Exploring together</h3>
+        <p>The camera and the leash between the two are the game's own. If Cheshire wanders too far from Cereza, the game stops him at the edge, the same as in solo play.</p>
+      </div>
+      <div class="scene">
+        <h3>Hug Mode</h3>
+        <ul>
+          <li>Either player picks Cheshire up: P1 with L, P2 with their L. It works while Cheshire is full-size.</li>
+          <li>While he's hugged, P1 walks. P2 aims Cheshire's stretch with their stick and stretches him out with R.</li>
+          <li>P2 presses R to send him back out.</li>
+        </ul>
+      </div>
+      <div class="scene">
+        <h3>Single Joy-Con, held sideways</h3>
+        <ul>
+          <li><strong>Cereza:</strong> stick moves, SR is ZL (Umbran Arts), SL is L (jump, interact, hug), the four buttons work in menus and text, and the small +/− button is menus.</li>
+          <li><strong>Cheshire:</strong> stick moves, SR attacks, SL is R (send out, stretch), stick click is L (hug), the four buttons are elements.</li>
+        </ul>
+      </div>
+      <div class="scene">
+        <h3>Playing solo</h3>
+        <p>Disconnect Player 2 and the mod gets out of the way: one controller plays both characters, as in the original game. You can leave the mod installed.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="menus-h" id="menus">
+    <div class="prose">
+      <span class="eyebrow">Menus</span>
+      <h2 id="menus-h">Menus and text</h2>
+      <p>The mod reads what the game is doing and switches by itself between normal play, text on screen, and menus.</p>
+    </div>
+    <div class="modes">
+      <div class="mode"><h3>Text on screen</h3><p>Dialogue, Cereza's comments and voice lines while you keep playing. Co-op goes on: P2 still moves Cheshire. P1's A advances or closes the text.</p></div>
+      <div class="arrow" aria-hidden="true"><b>⇄</b>the game decides</div>
+      <div class="mode"><h3>Menu or pop-up</h3><p>The world waits for input. P1's controller works as a normal controller: A confirms, B goes back, ZL / ZR and L / R switch tabs, sticks and D-pad navigate. P2 is ignored.</p></div>
+    </div>
+    <div class="prose">
+      <p>Close menus any way you like, with + or with Resume. The mod reads the game's own state, so it can't get out of step.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="limits">
+    <div class="verify">
+      <h2 id="limits">Known limitations</h2>
+      <ul>
+        <li><strong>Map (−):</strong> still uses the co-op split instead of giving Player 1 a normal controller.</li>
+        <li><strong>Controller screen:</strong> if the game opens the system controller screen (for example after a disconnect), it asks for one player and may drop Player 2. Reconnect Player 2 afterwards.</li>
+        <li><strong>Button icons:</strong> with Player 1 in handheld mode and Player 2 connected, on-screen button icons may follow Player 2's controller type.</li>
+        <li><strong>Tutorial windows:</strong> not every kind of pop-up has been seen in testing. If one doesn't accept Player 1's A, Player 2's A closes it. Please <a href="https://github.com/chokercrave/bayonetta-origins-coop/issues">open an issue</a> saying where it happened.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p>Origins Co-op v0.8.0 · exlaunch module <span class="mono">subsdk8</span> · game build <span class="mono">a1ce2940</span> · title <span class="mono">0100CF5010FEC000</span> · <a href="https://github.com/chokercrave/bayonetta-origins-coop">source and downloads</a></p>
+    <p>Base-game controls from <a href="https://www.siliconera.com/preview-bayonetta-origins-keeps-simultaneous-cereza-and-cheshire-controls-simple/">Siliconera's preview</a>, <a href="https://samurai-gamers.com/bayonetta-origins-cereza-and-the-lost-demon/game-controls-53/">Samurai Gamers' controls page</a> and <a href="https://gamingtrend.com/reviews/bayonetta-origins-cereza-and-the-lost-demon-review-umbran-tales/">GamingTrend's review</a>. None of them document which face button holds which element.</p>
+  </footer>
+</div>
+</body>
+</html>
