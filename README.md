@@ -36,12 +36,20 @@ different slot: this mod uses `subsdk8` and ships no `main.npdm`.
 
 ## Controls
 
-An illustrated version of this section, with both controllers drawn out, is in
-[CONTROLS.html](CONTROLS.html) (also included in the release zip; open it in a browser).
-
 The original game already splits one controller in half: the left half moves and acts for Cereza, the right half for
 Cheshire. The mod builds that controller from two. Each player holds a full controller, and the half that would belong
 to the other character is folded onto their own.
+
+<p align="center"><img src="docs/controls-split.svg" width="420" alt="One controller split down the middle: the left half is Cereza (Player 1), the right half is Cheshire (Player 2)"></p>
+
+<p align="center">
+  <img src="docs/controls-p1.svg" width="49%" alt="Player 1's controller: every button drives Cereza; A, B, X and Y work in menus and text only">
+  <img src="docs/controls-p2.svg" width="49%" alt="Player 2's controller: every button drives Cheshire; plus and minus are disabled">
+</p>
+
+Solid buttons are the character's own, dashed ones are the other half of the controller folded onto the same actions.
+The full illustrated guide, with situations and menu handling, is [CONTROLS.html](CONTROLS.html) (also in the release
+zip; open it in a browser).
 
 | Action | Player 1 (Cereza) | Player 2 (Cheshire) |
 |---|---|---|

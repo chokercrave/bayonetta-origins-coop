@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 246" width="400" height="246" role="img" aria-label="A controller split down the middle: the left half (left stick, L, ZL, D-pad, minus) is Cereza, the right half (right stick, R, ZR, A B X Y, plus) is Cheshire.">
+  <style>
+    text { font-family: "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif; }
+    .bg { fill: #ffffff; stroke: #d5ddd7; stroke-width: 1.5; }
+    .half-l { fill: #f3e3f1; } .half-r { fill: #dcf0eb; }
+    .cap { font-size: 18px; font-weight: 700; text-anchor: middle; }
+    .cap.l { fill: #8b3a86; } .cap.r { fill: #1d7a6c; }
+    .btn { stroke-width: 1.6; }
+    .p1 { fill: #8b3a86; stroke: #8b3a86; } .p2 { fill: #1d7a6c; stroke: #1d7a6c; }
+    .lbl { font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: #ffffff; }
+  </style>
+  <defs><clipPath id="padclip"><path d="M120 62 H280 C330 62 362 80 372 120 L392 206 C398 232 376 246 354 236 C332 226 318 200 296 186 H104 C82 200 68 226 46 236 C24 246 2 232 8 206 L28 120 C38 80 70 62 120 62 Z"/></clipPath></defs>
+  <rect class="bg" x="0.75" y="0.75" width="398.5" height="244.5" rx="14"/>
+  <g transform="translate(0 -12)">
+    <g clip-path="url(#padclip)"><rect class="half-l" x="0" y="0" width="200" height="250"/><rect class="half-r" x="200" y="0" width="200" height="250"/></g>
+    <path d="M120 62 H280 C330 62 362 80 372 120 L392 206 C398 232 376 246 354 236 C332 226 318 200 296 186 H104 C82 200 68 226 46 236 C24 246 2 232 8 206 L28 120 C38 80 70 62 120 62 Z" fill="none" stroke="#d5ddd7" stroke-width="2"/>
+    <line x1="200" y1="56" x2="200" y2="196" stroke="#5b6a63" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text class="cap l" x="100" y="34">Cereza · P1</text>
+    <text class="cap r" x="300" y="34">Cheshire · P2</text>
+    <rect class="btn p1" x="66" y="44" width="84" height="18" rx="9"/><text class="lbl" x="108" y="53">L · ZL</text>
+    <circle class="btn p1" cx="110" cy="115" r="22"/><text class="lbl" x="110" y="115">stick</text>
+    <path class="btn p1" d="M143 146 h14 v14 h14 v14 h-14 v14 h-14 v-14 h-14 v-14 h14 z"/>
+    <circle class="btn p1" cx="168" cy="98" r="8"/><text class="lbl" x="168" y="98">−</text>
+    <rect class="btn p2" x="250" y="44" width="84" height="18" rx="9"/><text class="lbl" x="292" y="53">R · ZR</text>
+    <circle class="btn p2" cx="266" cy="115" r="11"/><text class="lbl" x="266" y="115">Y</text>
+    <circle class="btn p2" cx="290" cy="91" r="11"/><text class="lbl" x="290" y="91">X</text>
+    <circle class="btn p2" cx="314" cy="115" r="11"/><text class="lbl" x="314" y="115">A</text>
+    <circle class="btn p2" cx="290" cy="139" r="11"/><text class="lbl" x="290" y="139">B</text>
+    <circle class="btn p2" cx="250" cy="167" r="22"/><text class="lbl" x="250" y="167">stick</text>
+    <circle class="btn p2" cx="232" cy="98" r="8"/><text class="lbl" x="232" y="98">+</text>
+  </g>
+</svg>
