@@ -54,9 +54,10 @@ zip; open it in a browser).
 | Action | Player 1 (Cereza) | Player 2 (Cheshire) |
 |---|---|---|
 | Move | either stick | either stick |
-| Jump, interact, pick Cheshire up (Hug Mode) | L or R | L |
+| Interact (Cereza's L actions) | L or R | — |
 | Umbran Arts, Witch Pulse | ZL or ZR | — |
 | Attack | — | ZL or ZR |
+| Pick Cheshire up (Hug Mode) | — | L |
 | Send Cheshire out / stretch him in Hug Mode | — | R |
 | Aim Cheshire's stretch in Hug Mode | — | stick |
 | Element forms | — | A / B / X / Y, or the D-pad (← Y, ↑ X, → A, ↓ B) |
@@ -66,6 +67,11 @@ zip; open it in a browser).
 Player 1's A / B / X / Y do nothing during normal play (they are Cheshire's buttons), but they work in menus and on
 text, see below.
 
+**Hug Mode is Player 2's.** In the original game Cereza's L both interacts and picks Cheshire up, and the game decides
+which one you meant. With two players, only Player 2's L puts Cheshire into Hug Mode, so Cheshire comes and goes on his
+own player's terms; Player 1's L still interacts with everything else. With no Player 2 connected, L works as in the
+original game.
+
 **Menus and text.** The mod reads what the game is doing and switches by itself:
 
 - **Menus and pop-up windows** (pause menu, title and main menu, windows that stop the game, the D-pad menu):
@@ -73,6 +79,8 @@ text, see below.
   Player 2 is ignored until the menu closes.
 - **Text on screen** (dialogue, Cereza's comments when examining something, voice lines while you keep playing):
   co-op goes on, so Player 2 can still move Cheshire, and Player 1's A advances or closes the text.
+- **Practice Room** (from the skill tree): both players play, and Player 1's A / B / X / Y also work, so Player 1 can
+  pick the skill and enemy in the room's windows. Those buttons are Cheshire's, so they can switch his element too.
 
 **Single Joy-Cons held sideways.** One Joy-Con per player also works. The game's own sideways layout has no ZL / ZR, so
 the mod maps them per character: for Cereza SR = ZL and SL = L, for Cheshire SR = attack, SL = R and the stick click
@@ -81,8 +89,8 @@ the mod maps them per character: for Cereza SR = ZL and SL = L, for Cheshire SR 
 ## Known limitations
 
 - **Map (−):** still uses the co-op split instead of giving Player 1 a normal controller.
-- **Hug Mode on one button:** Player 2 picks Cheshire up with L and sends him out with R, as in the original game.
-  Player 2's L is the same button as Cereza's L, so it can also make her jump or interact.
+- **Calling Cheshire back:** Player 1's stick click can still call Cheshire back from a distance, as in the original
+  game.
 - **Controller applet:** if the game opens the system controller screen (for example after a disconnect), it asks for
   one player and may drop Player 2. Reconnect Player 2 afterwards.
 - **Button icons:** with Player 1 in handheld mode and Player 2 connected, on-screen button icons may follow Player 2's
@@ -122,7 +130,7 @@ Compile-time switches in [source/program/config.hpp](source/program/config.hpp).
 | `COOP_P1_STICK` / `COOP_P2_STICK` | 2 | Stick that moves the character: 0 = left, 1 = right, 2 = whichever is pushed further |
 | `COOP_P1_FACE_TO_DPAD` | 0 | 1 = Player 1's face buttons press the D-pad. Off because the D-pad opens a menu during play |
 | `COOP_P2_DPAD_TO_FACE` | 1 | Player 2's D-pad presses the face buttons (elements) |
-| `COOP_P2_HUG` | 1 | Player 2's L starts Hug Mode. 0 = only Player 1 can |
+| `COOP_P2_HUG` | 1 | Hug Mode is Player 2's (their L). 0 = original split: Player 1's L starts it, Player 2's L acts as R |
 | `COOP_MENU_TOGGLE` | 1 | Menu and text handling described above. 0 = the co-op split everywhere |
 | `COOP_SINGLE_JOYCON` | 1 | Accept single sideways Joy-Cons |
 | `COOP_DIAG` | 0 | Extra `[ORCOOP]` diagnostics in the emulator log (button presses, memory changes; ~6 MB) |
@@ -149,6 +157,13 @@ Hooks:
    them).
 3. **`0x122E6C8`**, after the second `PollPad`: polls Player 2 through the game's own `PollPad`, builds one controller
    from both players (Player 1 → left half, Player 2 → right half) and writes it where the game reads its input.
+4. **`0x8EA254`**, in Cereza's update after her action table is reset: Cereza keeps an action → button table at
+   `+0x2664`. Actions 0, 16 and 20 are all L, and action 16 is Hug Mode, tested by 23 of her state handlers. While
+   co-op is on, action 16 is mapped to `0x10000000`, a bit the game's button layout does not use and that only Player
+   2's L sets. When two actions share a button the game asks `0x99F744` which one a press meant (`0x9ED708`), so it
+   already supports a separate hug button, and its own action locks keep working.
+5. **`0x11FE304`** / **`0x1203AFC`**: the Practice Room opening and closing. The room keeps UI mode bit 1 set for the
+   whole session, and dozens of other windows share that bit, so the room is tracked on its own.
 
 Menu and text detection reads the game's own state, all found by watching memory during play and confirmed in the
 code where possible:
@@ -161,6 +176,7 @@ code where possible:
 | UI mode (0 in play; 1 pop-up, 4 / 5 D-pad menu, `0x800` dialogue) | `0x4FF0074` | menus, or text for `0x800` |
 | Event request queue count (dialogue) | `0x1DB53B0` | text |
 | Message on screen (the game skips actor logic while set, 85 code sites) | `0x5036648` / `0x503664C` | text |
+| Practice Room open (hooks 5) | — | text, and UI mode bit 1 is not a menu |
 
 Each hook site's instruction word is checked at boot; on a different game build the mod logs `MISMATCH` and installs
 nothing.

@@ -29,9 +29,10 @@
 #define COOP_P2_DPAD_TO_FACE 1
 #endif
 
-// 1 = P2's L presses the game's L, so P2 can put Cheshire into Hug Mode as well as send him out with R.
-// Vanilla L is contextual (Cereza also jumps / interacts with it), so P2's L can trigger those too.
-// 0 = P2's L acts as R; only P1 can enter Hug Mode (vanilla split).
+// 1 = Hug Mode belongs to P2: P2's L (or the stick click on a sideways Joy-Con) puts Cheshire into Hug Mode and R sends
+// him out, while P1's L keeps Cereza's other uses (interact and the rest) but no longer picks Cheshire up or calls him
+// back. Done by remapping Cereza's own Hug Mode action to P2's button (HugMapHook in main.cpp).
+// 0 = vanilla split: P1's L enters Hug Mode, P2's L acts as R.
 #ifndef COOP_P2_HUG
 #define COOP_P2_HUG 1
 #endif

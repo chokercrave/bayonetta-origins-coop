@@ -69,6 +69,24 @@ constexpr u32 kUiText = 0x800;                      // in kUiMode: dialogue / te
 constexpr ptrdiff_t kUiPrompt         = 0x4FBF368;  // u32: 1 with pop-ups, but also stuck at 1 for minutes in
                                                     // Tir na nOg. Logged only; stopped + UI mode cover pop-ups.
 
+// Cereza's actor (update 0x8E93A0, actor in x19): +0x205C pad context, +0x2490 / +0x2494 buttons held / just pressed
+// (copied each frame from her context in the input layer at 0x4FBDFA8 + context * 0x38), +0x2664 action -> button
+// table (22 u32, reset to defaults while +0x2930 is set), +0x281C per-action disable flags, +0x2874 per-action lock
+// flags (a locked action's buttons are cleared from her input). Action 0 (+0x2664) and action 20 (+0x26B4) are L,
+// action 16 (+0x26A4) is L too and is Hug Mode: 23 state handlers test it (e.g. 0x8ED764: L just pressed + Cheshire,
+// class 0x1DA9A90, vtable +0x738 -> plush form, else "core_UI_Unable_Transform"; 0x8EB8F0: call him back). When action
+// 0 and action 16 share a button the game asks 0x99F744 which one the press meant (0x9ED708), so it already handles a
+// separate hug button.
+constexpr ptrdiff_t kCerezaInputCopy  = 0x8EA254;   // mov w9, #0x38 (joins after the table reset, before the copy)
+constexpr u32 kHugMapOffset = 0x26A4;
+constexpr u32 kHugBit = 0x10000000;                 // unused by the game's button layout; P2's hug button
+// Practice Room (reached from the skill tree): its open (0x11FDFF8, loads the core_UI_PracticeRoom windows) sets UI
+// mode bit 1 and its close (0x1202CD0) clears it, so the whole session read as a pop-up window. Bit 1 is shared by
+// dozens of windows, so the room is tracked on its own at those two instructions.
+constexpr ptrdiff_t kPracticeOpen     = 0x11FE304;  // orr w9, w9, #1 (UI mode |= 1)
+constexpr ptrdiff_t kPracticeClose    = 0x1203AFC;  // and w9, w9, #0xfffffffe (UI mode &= ~1)
+constexpr u32 kUiWindow = 0x1;
+
 constexpr u32 kNpadNo2 = 1;
 
 using PollPadFn = bool (*)(void* pad, GameInput* out);
@@ -81,6 +99,8 @@ u64 g_frame = 0;
 bool g_menu = false;     // menu mode: P1 normal controller, P2 ignored (COOP_MENU_TOGGLE)
 bool g_text = false;     // text mode: co-op, plus P1's face buttons as A / B / X / Y
 u32 g_p1Prev = 0;        // P1 buttons last frame (edge detection)
+bool g_coop = false;     // the co-op split is on this frame (P2 connected, not in menu mode)
+bool g_practice = false; // the Practice Room is open
 bool g_p2Seen = false;
 u32 g_p2Style = 0;
 
@@ -187,7 +207,9 @@ GameInput Compose(GameInput p1, GameInput p2) {
 
     b |= b2 & kFace;                             // P2's + and - are never passed: P1 owns pause and menus
     if (b2 & kR) b |= kR;
-    if (b2 & kL) b |= COOP_P2_HUG ? kL : kR;
+    // P2's L never reaches the game's L, which is Cereza's (interact and the rest). With COOP_P2_HUG it is P2's hug
+    // button (kHugBit, which HugMapHook maps to Cereza's Hug Mode action); without it, it acts as R.
+    if (b2 & kL) b |= COOP_P2_HUG ? kHugBit : kR;
     if (b2 & (kLS | kRS)) b |= kRS;
 #if COOP_P2_DPAD_TO_FACE
     b |= DpadToFace(b2);
@@ -266,30 +288,36 @@ HOOK_DEFINE_INLINE(SplitHook) {
         // UI mode 1 / 4 / 5. P1 gets a normal controller and P2 is ignored.
         // Text mode (text on screen, the game may go on: Cereza can walk during both): event queue,
         // message block, UI mode 0x800. Co-op goes on, and P1's face buttons also pass as A / B / X / Y so P1
-        // can advance or close the text.
+        // can advance or close the text. The Practice Room counts as text mode: its UI-mode bit 1 is not a menu, and
+        // P1's A confirms the room's own windows (skill and enemy selection).
         u32 loop = Abs<u32>(kLoopFlags);
         bool paused = (Abs<u32>(kPauseFlags) & kPauseBit) != 0;
         bool title = (loop & kMenuBit) != 0;
         bool stopped = (loop & kWorldPausedBit) != 0;
+        if (title) g_practice = false;           // left the game without the room closing
         u64 events = Abs<u64>(kEventQueueCount);
         u32 msgWord = Abs<u32>(kMessageBlock);
         u8 msgOpen = Abs<u8>(kMessageBlock + 4);
         u32 ui = Abs<u32>(kUiMode), prompt = Abs<u32>(kUiPrompt);
         u32 uiMenu = ui & ~kUiText;
+        if (g_practice) uiMenu &= ~kUiWindow;
         bool menu = COOP_MENU_TOGGLE && (paused || title || stopped || uiMenu != 0);
-        bool text = COOP_MENU_TOGGLE && !menu && (events != 0 || msgWord != 0 || msgOpen != 0 || (ui & kUiText) != 0);
-        if (menu != g_menu || text != g_text) {
+        bool text = COOP_MENU_TOGGLE && !menu &&
+                    (events != 0 || msgWord != 0 || msgOpen != 0 || (ui & kUiText) != 0 || g_practice);
+        bool modeChanged = menu != g_menu || text != g_text;
+        if (modeChanged) {
             g_menu = menu;
             g_text = text;
-            Logging.Log("[ORCOOP] mode %s (pause=%d title/menu=%d stopped=%d events=%lu msg=%x/%d ui=%x prompt=%x) "
-                        "frame=%lu", menu ? "MENU" : text ? "TEXT" : "PLAY", paused, title, stopped, events, msgWord,
-                        msgOpen, ui, prompt, g_frame);
+            Logging.Log("[ORCOOP] mode %s (pause=%d title/menu=%d stopped=%d events=%lu msg=%x/%d ui=%x prompt=%x "
+                        "practice=%d) frame=%lu", menu ? "MENU" : text ? "TEXT" : "PLAY", paused, title, stopped,
+                        events, msgWord, msgOpen, ui, prompt, g_practice, g_frame);
         }
         u32 p1Was = g_p1Prev;
         g_p1Prev = p1.buttons;
 
         // No P2 controller: P1 plays both characters as in vanilla.
-        GameInput o = g_menu || !p2on ? p1 : Compose(p1, p2);
+        g_coop = !g_menu && p2on;
+        GameInput o = g_coop ? Compose(p1, p2) : p1;
         if (g_text && p2on) o.buttons |= p1.buttons & kFace;
         *no1 = o;
         // The game merges the handheld result into No1 after this point; that input is already in p1.
@@ -309,14 +337,47 @@ HOOK_DEFINE_INLINE(SplitHook) {
             Logging.Log("[ORCOOP] P2 press %x -> out %x (menu=%d) frame=%lu", new2, o.buttons, g_menu, g_frame);
         }
         p2Prev = p2.buttons;
-        StateFrame(!g_menu && (new1 & (kL | kR | kFace)) != 0);
+        // Arm on every mode switch and every press by either player, menus included: entering a menu-hosted scene (the
+        // practice area from the level-up menu) shows up as the globals that change after P1 confirms, and Hug Mode as
+        // the ones that change after P1's or P2's L.
+        StateFrame(modeChanged || new1 != 0 || new2 != 0);
         if (g_frame % 600 == 0)
             Logging.Log("[ORCOOP] frame=%lu menu=%d p2=%d p1b=%x p2b=%x out=%x L=%d,%d R=%d,%d", g_frame, g_menu, p2on,
                         p1.buttons, p2.buttons, o.buttons, Milli(o.lx), Milli(o.ly), Milli(o.rx), Milli(o.ry));
 #else
-        (void)p2on; (void)p1Was;
+        (void)p2on; (void)p1Was; (void)modeChanged;
 #endif
         g_frame++;
+    }
+};
+
+// Hug Mode belongs to P2 (COOP_P2_HUG): while co-op is on, Cereza's Hug Mode action is mapped to kHugBit, which only
+// P2's L sets, so every one of the game's Hug Mode checks follows P2 and P1's L keeps actions 0 and 20 (interact and
+// the rest). Runs every frame after the table reset; the game's own lock and disable flags still apply. Only a map
+// still holding one of the two values is touched, so a mapping the game sets for a scene of its own is left alone.
+HOOK_DEFINE_INLINE(HugMapHook) {
+    static void Callback(exl::hook::InlineCtx* ctx) {
+        u32& map = *reinterpret_cast<u32*>(ctx->X[19] + kHugMapOffset);
+        u32 want = g_coop ? kHugBit : kL;
+        if (map == want || (map != kL && map != kHugBit)) return;
+        static u32 logged = 0;
+        if (logged++ < 100)
+            Logging.Log("[ORCOOP] Hug Mode action %x -> %x (actor %lx) frame=%lu", map, want, ctx->X[19], g_frame);
+        map = want;
+    }
+};
+
+HOOK_DEFINE_INLINE(PracticeOpenHook) {
+    static void Callback(exl::hook::InlineCtx*) {
+        g_practice = true;
+        Logging.Log("[ORCOOP] practice room open frame=%lu", g_frame);
+    }
+};
+
+HOOK_DEFINE_INLINE(PracticeCloseHook) {
+    static void Callback(exl::hook::InlineCtx*) {
+        g_practice = false;
+        Logging.Log("[ORCOOP] practice room closed frame=%lu", g_frame);
     }
 };
 
@@ -339,7 +400,7 @@ bool Check(ptrdiff_t off, u32 expected) {
 
 extern "C" void exl_main(void* x0, void* x1) {
     exl::hook::Initialize();
-    Logging.Log("[ORCOOP] v0.8.0 p1stick=%d p2stick=%d p1face=%d p2dpad=%d p2hug=%d menu=%d joycon=%d diag=%d",
+    Logging.Log("[ORCOOP] v0.9.0 p1stick=%d p2stick=%d p1face=%d p2dpad=%d p2hug=%d menu=%d joycon=%d diag=%d",
                 COOP_P1_STICK, COOP_P2_STICK, COOP_P1_FACE_TO_DPAD, COOP_P2_DPAD_TO_FACE, COOP_P2_HUG,
                 COOP_MENU_TOGGLE, COOP_SINGLE_JOYCON, COOP_DIAG);
 
@@ -356,6 +417,17 @@ extern "C" void exl_main(void* x0, void* x1) {
 #endif
     SupportedIdsHook::InstallAtOffset(kAfterSetIds);
     SplitHook::InstallAtOffset(kAfterPolls);
+#if COOP_MENU_TOGGLE
+    if (Check(kPracticeOpen, 0x32000129) && Check(kPracticeClose, 0x121F7929)) {
+        PracticeOpenHook::InstallAtOffset(kPracticeOpen);
+        PracticeCloseHook::InstallAtOffset(kPracticeClose);
+    }
+#endif
+#if COOP_P2_HUG
+    // str wzr, [x19, #0x2628] (end of the table reset); mov w9, #0x38.
+    if (Check(kCerezaInputCopy - 4, 0xB9262A7F) && Check(kCerezaInputCopy, 0x52800709))
+        HugMapHook::InstallAtOffset(kCerezaInputCopy);
+#endif
     Logging.Log("[ORCOOP] hooks installed");
 }
 

@@ -136,7 +136,7 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
 <body>
 <div class="wrap">
   <header>
-    <span class="eyebrow">Bayonetta Origins · co-op mod v0.8.0</span>
+    <span class="eyebrow">Bayonetta Origins · co-op mod v0.9.0</span>
     <h1>Origins Co-op Controls</h1>
     <p class="lede">Two players, one controller each. Player 1 is Cereza, Player 2 is Cheshire. Each player's whole controller drives their own character, so it doesn't matter which hand you hold things in.</p>
     <div class="who"><span class="tag p1"><i></i>Player 1 · Cereza</span><span class="tag p2"><i></i>Player 2 · Cheshire</span></div>
@@ -208,7 +208,7 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
         <div class="key"><span><i class="sw on"></i>Cereza's own</span><span><i class="sw fold"></i>folded onto Cereza</span><span><i class="sw off"></i>menus and text only</span></div>
         <dl class="legend">
           <div><dt><span class="chip">either stick</span></dt><dd>Move Cereza. Whichever stick is pushed further wins.</dd></div>
-          <div><dt><span class="chip">L</span><span class="chip">R</span></dt><dd>Jump, interact, and pick Cheshire up into Hug Mode. Context decides which.</dd></div>
+          <div><dt><span class="chip">L</span><span class="chip">R</span></dt><dd>Interact, and Cereza's other L actions. Picking Cheshire up is Player 2's job (see <a href="#hug">Hug Mode</a>).</dd></div>
           <div><dt><span class="chip">ZL</span><span class="chip">ZR</span></dt><dd>Umbran Arts and Witch Pulse.</dd></div>
           <div><dt><span class="chip">D-pad</span></dt><dd>Cereza's D-pad.</dd></div>
           <div><dt><span class="chip">Y X A B</span></dt><dd>Nothing during play (they belong to Cheshire). When text is on screen, A advances or closes it. In menus and pop-up windows they work as normal: A confirms, B goes back.</dd></div>
@@ -241,7 +241,7 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
           <div><dt><span class="chip">either stick</span></dt><dd>Move Cheshire. In Hug Mode it aims his stretch instead.</dd></div>
           <div><dt><span class="chip">ZR</span><span class="chip">ZL</span></dt><dd>Attack.</dd></div>
           <div><dt><span class="chip">R</span></dt><dd>Send Cheshire out of Hug Mode, or stretch him out while hugged.</dd></div>
-          <div><dt><span class="chip">L</span></dt><dd>Put Cheshire into Hug Mode. It's the same button as Cereza's L, so it can also make her jump or interact.</dd></div>
+          <div><dt><span class="chip">L</span></dt><dd>Put Cheshire into Hug Mode. Only Player 2 can, so Cheshire decides when he's picked up.</dd></div>
           <div><dt><span class="chip">Y X A B</span><span class="chip">D-pad</span></dt><dd>Elemental forms: Wood, Water, Fire, Stone, each on its own button once unlocked. Press the same one again to return to normal. D-pad arrows work by position: left Y, up X, right A, down B.</dd></div>
           <div><dt><span class="chip">+</span><span class="chip">−</span></dt><dd>Disabled. Player 1 owns pause and menus.</dd></div>
         </dl>
@@ -257,12 +257,12 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
         <thead><tr><th>Action</th><th>Player</th><th>Buttons</th></tr></thead>
         <tbody>
           <tr><td>Walk Cereza</td><td class="c1">P1</td><td>either stick</td></tr>
-          <tr><td>Jump, interact</td><td class="c1">P1</td><td>L or R</td></tr>
+          <tr><td>Interact</td><td class="c1">P1</td><td>L or R</td></tr>
           <tr><td>Umbran Arts, Witch Pulse</td><td class="c1">P1</td><td>ZL or ZR</td></tr>
           <tr><td>Move Cheshire</td><td class="c2">P2</td><td>either stick</td></tr>
           <tr><td>Attack</td><td class="c2">P2</td><td>ZR or ZL</td></tr>
           <tr><td>Change element</td><td class="c2">P2</td><td>Y X A B, or the D-pad</td></tr>
-          <tr><td>Hug Mode: pick Cheshire up</td><td>either</td><td>P1: L or R · P2: L</td></tr>
+          <tr><td>Hug Mode: pick Cheshire up</td><td class="c2">P2</td><td>L</td></tr>
           <tr><td>Hug Mode: send Cheshire out</td><td class="c2">P2</td><td>R</td></tr>
           <tr><td>Pause, map</td><td class="c1">P1</td><td>+ or −</td></tr>
         </tbody>
@@ -290,9 +290,9 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
         <p>The camera and the leash between the two are the game's own. If Cheshire wanders too far from Cereza, the game stops him at the edge, the same as in solo play.</p>
       </div>
       <div class="scene">
-        <h3>Hug Mode</h3>
+        <h3 id="hug">Hug Mode</h3>
         <ul>
-          <li>Either player picks Cheshire up: P1 with L, P2 with their L. It works while Cheshire is full-size.</li>
+          <li>Player 2 picks Cheshire up with L. Player 1's L only interacts, so Cereza never grabs him by accident. It works while Cheshire is full-size.</li>
           <li>While he's hugged, P1 walks. P2 aims Cheshire's stretch with their stick and stretches him out with R.</li>
           <li>P2 presses R to send him back out.</li>
         </ul>
@@ -300,13 +300,17 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
       <div class="scene">
         <h3>Single Joy-Con, held sideways</h3>
         <ul>
-          <li><strong>Cereza:</strong> stick moves, SR is ZL (Umbran Arts), SL is L (jump, interact, hug), the four buttons work in menus and text, and the small +/− button is menus.</li>
+          <li><strong>Cereza:</strong> stick moves, SR is ZL (Umbran Arts), SL is L (interact), the four buttons work in menus and text, and the small +/− button is menus.</li>
           <li><strong>Cheshire:</strong> stick moves, SR attacks, SL is R (send out, stretch), stick click is L (hug), the four buttons are elements.</li>
         </ul>
       </div>
       <div class="scene">
+        <h3>Practice Room</h3>
+        <p>Entered from the skill tree. Both players play, and Player 1's A, B, X and Y also work, so Player 1 can pick the skill and the enemy in the room's windows. Those are Cheshire's buttons, so they can switch his element too.</p>
+      </div>
+      <div class="scene">
         <h3>Playing solo</h3>
-        <p>Disconnect Player 2 and the mod gets out of the way: one controller plays both characters, as in the original game. You can leave the mod installed.</p>
+        <p>Disconnect Player 2 and the mod gets out of the way: one controller plays both characters, as in the original game, and Cereza's L picks Cheshire up again. You can leave the mod installed.</p>
       </div>
     </div>
   </section>
@@ -332,6 +336,7 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
       <h2 id="limits">Known limitations</h2>
       <ul>
         <li><strong>Map (−):</strong> still uses the co-op split instead of giving Player 1 a normal controller.</li>
+        <li><strong>Calling Cheshire back:</strong> Player 1's stick click can still call Cheshire back from a distance, as in the original game.</li>
         <li><strong>Controller screen:</strong> if the game opens the system controller screen (for example after a disconnect), it asks for one player and may drop Player 2. Reconnect Player 2 afterwards.</li>
         <li><strong>Button icons:</strong> with Player 1 in handheld mode and Player 2 connected, on-screen button icons may follow Player 2's controller type.</li>
         <li><strong>Tutorial windows:</strong> not every kind of pop-up has been seen in testing. If one doesn't accept Player 1's A, Player 2's A closes it. Please <a href="https://github.com/chokercrave/bayonetta-origins-coop/issues">open an issue</a> saying where it happened.</li>
@@ -340,7 +345,7 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--rule);
   </section>
 
   <footer>
-    <p>Origins Co-op v0.8.0 · exlaunch module <span class="mono">subsdk8</span> · game build <span class="mono">a1ce2940</span> · title <span class="mono">0100CF5010FEC000</span> · <a href="https://github.com/chokercrave/bayonetta-origins-coop">source and downloads</a></p>
+    <p>Origins Co-op v0.9.0 · exlaunch module <span class="mono">subsdk8</span> · game build <span class="mono">a1ce2940</span> · title <span class="mono">0100CF5010FEC000</span> · <a href="https://github.com/chokercrave/bayonetta-origins-coop">source and downloads</a></p>
     <p>Base-game controls from <a href="https://www.siliconera.com/preview-bayonetta-origins-keeps-simultaneous-cereza-and-cheshire-controls-simple/">Siliconera's preview</a>, <a href="https://samurai-gamers.com/bayonetta-origins-cereza-and-the-lost-demon/game-controls-53/">Samurai Gamers' controls page</a> and <a href="https://gamingtrend.com/reviews/bayonetta-origins-cereza-and-the-lost-demon-review-umbran-tales/">GamingTrend's review</a>. None of them document which face button holds which element.</p>
   </footer>
 </div>
